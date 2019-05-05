@@ -12,6 +12,6 @@ mu12 = angsr * eCharge  # magnetic moment
 mu21 = mu12  # is it true?
 
 # time variables for modeling
-timeStop = 0.1  # s
-pntNumber = 5
+timeStop = 10  # s
+pntNumber = 10000
 
