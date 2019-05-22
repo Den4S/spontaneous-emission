@@ -2,6 +2,7 @@ from condition import *
 import numpy as np
 from matplotlib import pyplot as plt
 
+
 #  Rabi oscillation modeling.
 # k = 0.1  # k should be in (0.1, 0.5)
 # omegaWave = (1 - k) * omega21  # Hz (red light)

@@ -14,7 +14,8 @@ def lorentz(x_arr, x_0, gamma, max_y):  # procedure for building a custom Lorent
 
 
 eps = 0.01  # thresold value of photon radiation
-N = 10000  # number of atoms
+N = 100000  # number of atoms
+
 radT = []  # array for radiation time T1, T2, ..., TN
 gammaSpont = 1  # constant coefficient of spontaneous emission
 globalTime = 0
