@@ -11,12 +11,12 @@ gamma = 1
 
 t0 = math.log(pntNumber) / (gamma * (pntNumber + 1))
 
-for photonNumber in range(pntNumber):
-    frstAtan = math.tanh((2 * (pntNumber / 2 - (photonNumber + 1)) - 1) / (pntNumber + 1))  # M = N / 2 - n
-    scndAtan = math.tanh((2 * (pntNumber / 2) - 1) / (pntNumber + 1))  # M = N / 2
-    tNew = 2 / (gamma * (pntNumber + 1)) * (frstAtan - scndAtan)
+for photonNumber in range(pntNumber-1):
+    frstAtan = math.atanh((2 * (pntNumber / 2 - (photonNumber + 1)) - 1) / (pntNumber + 1))  # M = N / 2 - n
+    scndAtan = math.atanh((2 * (pntNumber / 2) - 1) / (pntNumber + 1))  # M = N / 2
+    tNew = -2 / (gamma * (pntNumber + 1)) * (frstAtan - scndAtan)
     tNphoton.append(tNew)
-    intensityNew = (math.cosh((pntNumber + 1) * (t0 - tNew) / 2))**2
+    intensityNew = gamma * ((pntNumber + 1) / 2)**2 * (1.0 / (math.cosh((pntNumber + 1) * (tNew - t0) / 2)))**2
     tNintensity.append(intensityNew)
 
 fig, ax = plt.subplots()  # creating a plot
@@ -28,3 +28,5 @@ plt.legend(("$I_{analyt}(t)$",), loc=1)  # plot legend
 
 plt.plot()
 plt.show()
+
+print(tNphoton)
