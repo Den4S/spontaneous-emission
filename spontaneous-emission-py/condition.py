@@ -1,4 +1,4 @@
-pntNumber = 10000  # number of atoms
+pntNumber = 100000  # number of atoms
 
 # time variable for modeling
 timeStop = 10  # s
