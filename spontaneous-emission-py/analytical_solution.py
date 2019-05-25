@@ -1,12 +1,55 @@
-from condition import *
+import random
 import math
 import numpy as np
 from matplotlib import pyplot as plt
-import spontaneous_simulation as spsim
 
 
-# if $\epsilon == 1$ => analytical solution exists!
-def analytical(N):
+def findTau(time, function):  # let's find 2 * deltaT: it's full width at half maximum
+    flagL = False
+    flagR = False
+    indL = 0
+    indR = 0
+    functionMax = max(function)
+    for i in range(len(function)):
+        if (not flagL) and (function[i] > functionMax / 2):
+            indL = i
+            flagL = True
+        if (not flagR) and flagL and (function[i] < functionMax / 2):
+            indR = i
+            flagR = True
+    delta = (time[indR] - time[indL]) / 2
+    return delta
+
+
+def MonteCarloMethod1(N):
+    # eps - thresold value of photon radiation
+    # N - number of atoms
+    eps = 1
+    radT = []  # array for radiation time T1, T2, ..., TN
+    gammaSpont = 1  # constant coefficient of spontaneous emission
+    globalTime = 0
+    funcArray = []
+    for p in np.arange(1, N + 1):
+        step = 2
+        count = 0
+        while step > eps:  # finding moment of radiation
+            step = random.random()
+            count = count + 1
+        M = (N - 2 * (p - 1)) / 2
+        gammaCurrent = gammaSpont * (N / 2 + M) * (N / 2 - M + 1)
+        globalTime = globalTime + (eps / gammaCurrent) * count
+        funcArray.append(gammaCurrent * globalTime)
+        radT.append(globalTime)
+
+    funcMax = max(funcArray)  # funcArray extremum
+    indMax = funcArray.index(funcMax)
+
+    deltaT = findTau(radT, funcArray)
+
+    return radT, funcArray, indMax, deltaT
+
+
+def analytical(N):  # if $\epsilon == 1$ => analytical solution exists!
     tNphoton = []  # n photons emitted
     tNintensity = []
     gamma = 1
@@ -25,28 +68,38 @@ def analytical(N):
 
 
 def forEps1(N):  # calculates and display plots for epsilon = 1
-    eps = 1
     tNphoton, tNintensity = analytical(N)  # T_N and I_N arrays for analytical solution
-    tN, fN, lorN, iM = spsim.MonteCarloMethod(eps, N)
+    tN, fN, iM, deltaMcT = MonteCarloMethod1(N)  # our Monte Carlo method for comparison with analytical solution
 
-    maxI = max(tNintensity) # BAD normalization!!!
-    maxF = fN[iM]
+    normCoeff = fN[iM] / max(tNintensity)  # BAD normalization!!!
+    # print(1 / normCoeff)
     for ind in range(len(tNintensity)):
-        tNintensity[ind] = tNintensity[ind] * maxF / maxI
+        tNintensity[ind] = tNintensity[ind] * normCoeff
 
-    return tNphoton, tNintensity, tN, fN, lorN, iM
+    delta = findTau(tNphoton, tNintensity)
+
+    return tNphoton, tNintensity, tN, fN, iM, delta, deltaMcT
 
 
 # MAIN
 nAtoms = 100000
-tN, iN, tArr, funcArr, lorentzArr, iMax = forEps1(nAtoms)
+tIntensArr, intensArr, tArr, funcArr, iMax, tau, tauMc = forEps1(nAtoms)
 
-# display the plot
+tauAnArr = []  # full width at half maximum for analytical solution
+tauMcArr = []  # full width at half maximum for MC method
+nAtArr = []
+for nAtoms in range(1000, 100000, 1000):
+    tIntensArrN, intensArrN, tArrN, funcArrN, iMaxN, tauN, tauMcN = forEps1(nAtoms)
+    tauAnArr.append(tauN)
+    tauMcArr.append(tauMcN)
+    nAtArr.append(nAtoms)
+
+# displaying a plot for one value of nAtoms
 figAn, ax = plt.subplots()  # creating a plot
 ax.set_xlabel('t, s', size=12)
 ax.set_ylabel('$\gamma T_n$', size=12)
 
-plt.plot(tN, iN, 'm', linestyle='-', linewidth=1)  # intensity function (analytical)
+plt.plot(tIntensArr, intensArr, 'm', linestyle='-', linewidth=1)  # intensity function (analytical)
 plt.plot(tArr, funcArr, 'blue')  # our function
 plt.plot([1 / nAtoms * np.log(nAtoms), 1 / nAtoms * np.log(nAtoms)], [0, 1.05 * max(funcArr)], 'm',
          linestyle='--', linewidth=1)  # theoretical extremum line
@@ -54,6 +107,19 @@ plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'red', linestyle='-
 
 plt.legend(("$I_{analitical}(t)$", "$\gamma T_n(t)$", "1 / (N * ln(N))",
             "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
+
+plt.plot()
+plt.show(block=False)
+
+# plot tau(N) for analytical solution when
+fig2, ax2 = plt.subplots()  # creating a plot
+ax2.set_xlabel('Number of atoms', size=12)
+ax2.set_ylabel('$tau$', size=12)
+
+plt.plot(nAtArr, tauMcArr, 'b', linestyle='-', linewidth=1.5)  # tau(N) for MC method
+plt.plot(nAtArr, tauAnArr, 'm', linestyle='--', linewidth=1.5)  # tau(N) for analytical solution
+
+plt.legend(("$Analytical\; for\; \epsilon = 1$", "$MC\; for\; \epsilon = 1$"), loc=1)  # plot legend
 
 plt.plot()
 plt.show()

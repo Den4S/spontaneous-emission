@@ -13,6 +13,23 @@ def lorentz(x_arr, x_0, gamma, max_y):  # procedure for building a custom Lorent
     return y_arr
 
 
+def findTau(time, function):  # let's find 2 * deltaT: it's full width at half maximum
+    flagL = False
+    flagR = False
+    indL = 0
+    indR = 0
+    functionMax = max(function)
+    for i in range(len(function)):
+        if (not flagL) and (function[i] > functionMax / 2):
+            indL = i
+            flagL = True
+        if (not flagR) and flagL and (function[i] < functionMax / 2):
+            indR = i
+            flagR = True
+    delta = (time[indR] - time[indL]) / 2
+    return delta
+
+
 def MonteCarloMethod(eps, N):
     # eps - thresold value of photon radiation
     # N - number of atoms
@@ -36,44 +53,50 @@ def MonteCarloMethod(eps, N):
     indMax = funcArray.index(funcMax)
 
     # let's find: 2 * deltaT is full width at half maximum
-    flagL = False
-    flagR = False
-    indL = 0
-    indR = 0
-    for i in range(N + 1):
-        if (not flagL) and (funcArray[i] > funcMax / 2):
-            indL = i
-            flagL = True
-        if (not flagR) and flagL and (funcArray[i] < funcMax / 2):
-            indR = i
-            flagR = True
-    deltaT = (radT[indR] - radT[indL]) / 2
-    # print("deltaT =", deltaT, "s")  # a parameter for Lorentz function
+    deltaT = findTau(radT, funcArray)
 
     lArr = lorentz(radT, radT[indMax], deltaT, max(funcArray))
-    return radT, funcArray, lArr, indMax
+    return radT, funcArray, lArr, indMax, deltaT
 
 
 # MAIN
-epsilon = 0.01
-nAtoms = 10000
+epsilon = 0.1
+nAtomsFix = 10000
 
-tArr, funcArr, lorentzArr, iMax = MonteCarloMethod(epsilon, nAtoms)
+tArr, funcArr, lorentzArr, iMax, tau = MonteCarloMethod(epsilon, nAtomsFix)
 
-# display the plot
-fig, ax = plt.subplots()  # creating a plot
-ax.set_xlabel('t, s', size=12)
-ax.set_ylabel('$\gamma T_n$', size=12)
+tauArr = []
+nAtArr = []
+for nAtoms in range(1000, 100000, 1000):
+    tArrN, funcArrN, lorentzArrN, iMaxN, tauN = MonteCarloMethod(epsilon, nAtoms)
+    tauArr.append(tauN)
+    nAtArr.append(nAtoms)
+
+# displaying a plot $\gamma T_n(t)$ for one value of nAtoms
+fig1, ax1 = plt.subplots()  # creating a plot
+ax1.set_xlabel('t, s', size=12)
+ax1.set_ylabel('$\gamma T_n$', size=12)
 
 plt.plot(tArr, funcArr, 'blue')  # our function
 plt.plot(tArr, lorentzArr, 'green', linestyle='-', linewidth=1)  # Lorentz
 
-plt.plot([1 / nAtoms * np.log(nAtoms), 1 / nAtoms * np.log(nAtoms)], [0, 1.05 * max(funcArr)], 'magenta',
+plt.plot([1 / nAtomsFix * np.log(nAtomsFix), 1 / nAtomsFix * np.log(nAtomsFix)], [0, 1.05 * max(funcArr)], 'magenta',
          linestyle='--', linewidth=1)  # theoretical extremum line
 plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'red', linestyle='-.', linewidth=1)  # extremum line
 
 plt.legend(("$\gamma T_n(t)$", "Lorentz", "1 / (N * ln(N))", "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
 
 plt.plot()
-plt.show()
+plt.show(block=False)
 
+# plot tau(N)
+fig2, ax2 = plt.subplots()  # creating a plot
+ax2.set_xlabel('Number of atoms', size=12)
+ax2.set_ylabel('$tau$', size=12)
+
+plt.plot(nAtArr, tauArr, 'red', linestyle='-.', linewidth=1.5)  # tau(N)
+
+plt.legend(("$\epsilon =$" + str(epsilon),), loc=1)  # plot legend
+
+plt.plot()
+plt.show()
