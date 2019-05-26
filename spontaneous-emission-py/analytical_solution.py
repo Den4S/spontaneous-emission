@@ -72,9 +72,13 @@ def forEps1(N):  # calculates and display plots for epsilon = 1
     tN, fN, iM, deltaMcT = MonteCarloMethod1(N)  # our Monte Carlo method for comparison with analytical solution
 
     normCoeff = fN[iM] / max(tNintensity)  # BAD normalization!!!
-    # print(1 / normCoeff)
+
+    # iMintens = tNintensity.index(max(tNintensity))  # artificial translation!!!
+    # dT = tN[iM] - tNphoton[iMintens]
+
     for ind in range(len(tNintensity)):
         tNintensity[ind] = tNintensity[ind] * normCoeff
+        # tNphoton[ind] = tNphoton[ind] + dT
 
     delta = findTau(tNphoton, tNintensity)
 
@@ -99,15 +103,17 @@ figAn, ax = plt.subplots(figsize=(8, 5))  # creating a plot
 ax.set_xlabel('t, s', size=12)
 ax.set_ylabel('$\gamma_{m}$', size=12)
 
-plt.plot(tIntensArr, intensArr, 'm', linestyle='-', linewidth=1)  # intensity function (analytical)
-plt.plot(tArr, funcArr, 'blue')  # our function
+plt.plot(tIntensArr, intensArr, 'm', linestyle='-', linewidth=1.5)  # intensity function (analytical)
+plt.plot(tArr, funcArr, 'blue', linestyle='--', linewidth=1)  # our function
 plt.plot([1 / nAtoms * np.log(nAtoms), 1 / nAtoms * np.log(nAtoms)], [0, 1.05 * max(funcArr)], 'm',
          linestyle='--', linewidth=1)  # theoretical extremum line
-plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'red', linestyle='-.', linewidth=1)  # extremum line
+plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'r', linestyle='-.', linewidth=1)  # extremum line
 
-plt.legend(("$I_{analitical}(t)$", "$\gamma T_n(t)$", "1 / (N * ln(N))",
-            "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
+plt.legend(("$I_{analytical}$", "$I_{MC}$",
+            "1 / (N * ln(N))", "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
+
 plt.title('$\gamma_{m}(T_{m})$')
+
 plt.plot()
 plt.show(block=False)
 
@@ -119,7 +125,9 @@ ax2.set_ylabel('$\\tau$', size=12)
 plt.plot(nAtArr, tauMcArr, 'b', linestyle='-', linewidth=1.5)  # tau(N) for MC method
 plt.plot(nAtArr, tauAnArr, 'm', linestyle='--', linewidth=1.5)  # tau(N) for analytical solution
 plt.title('$\\tau(N)$')
-plt.legend(("$Analytical\; for\; \epsilon = 1$", "$MC\; for\; \epsilon = 1$"), loc=1)  # plot legend
+plt.legend(("$MC\; for\; \epsilon = 1$", "$Analytical\; for\; \epsilon = 1$"), loc=1)  # plot legend
+
+plt.title('$\\tau(N)$')
 
 plt.plot()
 plt.show()
