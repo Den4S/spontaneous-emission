@@ -73,9 +73,9 @@ for nAtoms in range(1000, 100000, 1000):
     nAtArr.append(nAtoms)
 
 # displaying a plot $\gamma T_n(t)$ for one value of nAtoms
-fig1, ax1 = plt.subplots()  # creating a plot
+fig1, ax1 = plt.subplots(figsize=(8, 5))  # creating a plot
 ax1.set_xlabel('t, s', size=12)
-ax1.set_ylabel('$\gamma T_n$', size=12)
+ax1.set_ylabel('$\gamma_{m}$', size=12)
 
 plt.plot(tArr, funcArr, 'blue')  # our function
 plt.plot(tArr, lorentzArr, 'green', linestyle='-', linewidth=1)  # Lorentz
@@ -85,15 +85,15 @@ plt.plot([1 / nAtomsFix * np.log(nAtomsFix), 1 / nAtomsFix * np.log(nAtomsFix)],
 plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'red', linestyle='-.', linewidth=1)  # extremum line
 
 plt.legend(("$\gamma T_n(t)$", "Lorentz", "1 / (N * ln(N))", "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
-
+plt.title('$\gamma_{m}(T_{m})$')
 plt.plot()
 plt.show(block=False)
 
 # plot tau(N)
-fig2, ax2 = plt.subplots()  # creating a plot
+fig2, ax2 = plt.subplots(figsize=(8, 5))  # creating a plot
 ax2.set_xlabel('Number of atoms', size=12)
-ax2.set_ylabel('$tau$', size=12)
-
+ax2.set_ylabel('$\\tau$', size=12)
+plt.title('$\\tau(N)$')
 plt.plot(nAtArr, tauArr, 'red', linestyle='-.', linewidth=1.5)  # tau(N)
 
 plt.legend(("$\epsilon =$" + str(epsilon),), loc=1)  # plot legend

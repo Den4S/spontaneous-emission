@@ -95,9 +95,9 @@ for nAtoms in range(1000, 100000, 1000):
     nAtArr.append(nAtoms)
 
 # displaying a plot for one value of nAtoms
-figAn, ax = plt.subplots()  # creating a plot
+figAn, ax = plt.subplots(figsize=(8, 5))  # creating a plot
 ax.set_xlabel('t, s', size=12)
-ax.set_ylabel('$\gamma T_n$', size=12)
+ax.set_ylabel('$\gamma_{m}$', size=12)
 
 plt.plot(tIntensArr, intensArr, 'm', linestyle='-', linewidth=1)  # intensity function (analytical)
 plt.plot(tArr, funcArr, 'blue')  # our function
@@ -107,18 +107,18 @@ plt.plot([tArr[iMax], tArr[iMax]], [0, 1.05 * max(funcArr)], 'red', linestyle='-
 
 plt.legend(("$I_{analitical}(t)$", "$\gamma T_n(t)$", "1 / (N * ln(N))",
             "$\max \; (\gamma T_n(t))$"), loc=1)  # plot legend
-
+plt.title('$\gamma_{m}(T_{m})$')
 plt.plot()
 plt.show(block=False)
 
 # plot tau(N) for analytical solution when
-fig2, ax2 = plt.subplots()  # creating a plot
+fig2, ax2 = plt.subplots(figsize=(8, 5))  # creating a plot
 ax2.set_xlabel('Number of atoms', size=12)
-ax2.set_ylabel('$tau$', size=12)
+ax2.set_ylabel('$\\tau$', size=12)
 
 plt.plot(nAtArr, tauMcArr, 'b', linestyle='-', linewidth=1.5)  # tau(N) for MC method
 plt.plot(nAtArr, tauAnArr, 'm', linestyle='--', linewidth=1.5)  # tau(N) for analytical solution
-
+plt.title('$\\tau(N)$')
 plt.legend(("$Analytical\; for\; \epsilon = 1$", "$MC\; for\; \epsilon = 1$"), loc=1)  # plot legend
 
 plt.plot()
